@@ -1,0 +1,23 @@
+menu "Setup Wi-Fi"
+
+    config ESP_WIFI_SSID
+        string "WiFi SSID"
+        default "ssid"
+        help
+            The "name" of the network.
+
+    config ESP_WIFI_PASSWORD
+        string "Wi-Fi password"
+        default "minha_senha"
+        help
+            The password to connect with the network with the chosen SSID.
+endmenu
+
+menu "Power Saving"
+
+    config POWER_SAVING
+        bool "Power Saving"
+        default false
+        help
+            Enable or disable power saving mode in period between publishes
+endmenu
