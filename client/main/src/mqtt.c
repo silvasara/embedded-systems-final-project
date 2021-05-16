@@ -21,6 +21,7 @@
 #include "mqtt_client.h"
 
 #include "mqtt.h"
+#include "cJSON.h"
 
 #define TAG "MQTT"
 
@@ -113,6 +114,21 @@ void mqtt_start(){
 }
 
 void mqtt_send_message(char *topic, char *message){
-    int message_id = esp_mqtt_client_publish(client, topic, message, 0, 1, 0);
+    char *payload = NULL;
+
+    cJSON *json = cJSON_CreateObject();
+
+    if (cJSON_AddStringToObject(json, "content", "testando") == NULL)
+        goto end;
+
+    payload = cJSON_Print(json);
+
+    int message_id = esp_mqtt_client_publish(client, topic, payload, 0, 1, 0);
     ESP_LOGI(TAG, "Message sent, ID: %d", message_id);
+    return;
+
+end:
+    ESP_LOGI(TAG, "Error creating JSON object!");
+    cJSON_Delete(json);
+    return;
 }
