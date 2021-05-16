@@ -7,6 +7,7 @@
 
 #include "wifi.h"
 #include "mqtt.h"
+#include "gpio.h"
 
 xSemaphoreHandle conn_wifi_semaphore;
 xSemaphoreHandle conn_mqtt_semaphore;
@@ -59,6 +60,8 @@ void app_main(void)
     conn_wifi_semaphore = xSemaphoreCreateBinary();
     conn_mqtt_semaphore = xSemaphoreCreateBinary();
     wifi_start();
+
+    set_up_gpio();
 
     xTaskCreate(&wifi_connected,  "MQTT connection", 4096, NULL, 1, NULL);
     xTaskCreate(&mqtt_connected,  "Broker communication", 4096, NULL, 1, NULL);
