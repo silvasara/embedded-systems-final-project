@@ -53,3 +53,8 @@ dkms.conf
 
 build
 sdkconfig*
+
+
+# python
+venv/
+__pycache__/
