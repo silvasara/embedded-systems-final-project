@@ -15,19 +15,21 @@
 xSemaphoreHandle conn_wifi_semaphore;
 xSemaphoreHandle conn_mqtt_semaphore;
 
-typedef struct Environ
-{
-    int temp;
-    int humidity;
-} Environ;
-
-
-Environ env;
+char mac[18];
 
 void wifi_connected(void *params){
     while(true){
         if(xSemaphoreTake(conn_wifi_semaphore, portMAX_DELAY)){
             mqtt_start();
+            get_mac((char *) mac);
+
+            char topic[100];
+            sprintf(topic, "fse2020/160144752/dispositivos/%s", mac);
+
+            char msg[50];
+            sprintf(msg, "%s", mac);
+
+            mqtt_send_message(topic, msg);
         }
     }
 }
@@ -56,9 +58,6 @@ void mqtt_connected(void *params){
 
 void app_main(void)
 {
-    env.temp = 25;
-    env.humidity = 10;
-
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
       ESP_ERROR_CHECK(nvs_flash_erase());

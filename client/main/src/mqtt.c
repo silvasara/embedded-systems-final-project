@@ -38,34 +38,28 @@ static void log_error_if_nonzero(const char *message, int error_code)
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
 
-    // esp_mqtt_client_handle_t event_client = event->client;
-    // int msg_id;
+    int msg_id;
 
     switch (event->event_id) {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
         xSemaphoreGive(conn_mqtt_semaphore);
+        
+        char mac[18];
+        get_mac((char *) mac);
 
-        // msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
-        // ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
+        char topic[100];
+        sprintf(topic, "fse2020/160144752/dispositivos/%s", mac);
 
-        // msg_id = esp_mqtt_client_subscribe(client, "/topic/qos0", 0);
-        // ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-        // msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);
-        // ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-        // msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
-        // ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
+        msg_id = esp_mqtt_client_subscribe(client, topic, 0);
         break;
+
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
         break;
 
     case MQTT_EVENT_SUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-        // msg_id = esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
-        // ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_UNSUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
@@ -131,4 +125,12 @@ end:
     ESP_LOGI(TAG, "Error creating JSON object!");
     cJSON_Delete(json);
     return;
+}
+
+void get_mac(char *mac){
+    uint8_t mac_arr[6];
+
+    ESP_ERROR_CHECK(esp_read_mac(mac_arr, ESP_MAC_WIFI_STA));
+
+    sprintf(mac, "%2X:%2X:%2X:%2X:%2X:%2X", mac_arr[0], mac_arr[1], mac_arr[2], mac_arr[3], mac_arr[4], mac_arr[5]);
 }
