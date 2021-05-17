@@ -9,38 +9,11 @@
 #include "gpio.h"
 
 xQueueHandle interruption_queue;
+int led_state = 0;
 
-static void IRAM_ATTR gpio_isr_handler(void *args){
-  int pin = (int)args;
-  xQueueSendFromISR(interruption_queue, &pin, NULL);
-}
-
-void handle_interruption(void *params){
-    int pin;
-    int counter = 0;
-
-    while(true) {
-        if(xQueueReceive(interruption_queue, &pin, portMAX_DELAY)){
-            // De-bouncing
-            int state = gpio_get_level(pin);
-            printf("pin = %d\n", pin);
-
-            if(state == 1){
-                gpio_isr_handler_remove(pin);
-                while(gpio_get_level(pin) == state){
-                    vTaskDelay(50 / portTICK_PERIOD_MS);
-                }
-
-                printf("BOTÃO PRESSIONADO %d vezes!\n", ++counter);
-
-                // Habilitar novamente a interrupção
-                vTaskDelay(50 / portTICK_PERIOD_MS);
-                gpio_isr_handler_add(pin, gpio_isr_handler, (void *) pin);
-            }
-
-        }
-    }
-}
+static void IRAM_ATTR _gpio_isr_handler(void *args);
+void _handle_interruption(void *params);
+void _toggle_led();
 
 void set_up_gpio(){
     // PIN configuration
@@ -49,6 +22,7 @@ void set_up_gpio(){
 
     // Define PIN as output
     gpio_set_direction(LED, GPIO_MODE_OUTPUT);
+    gpio_set_level(LED, led_state); // Ensure the led is off
 
     // Define PIN as input
     gpio_set_direction(BTN, GPIO_MODE_INPUT);
@@ -63,9 +37,48 @@ void set_up_gpio(){
     gpio_set_intr_type(BTN, GPIO_INTR_POSEDGE);
 
     interruption_queue = xQueueCreate(10, sizeof(int));
-    xTaskCreate(handle_interruption, "Handle button", 2048, NULL, 1, NULL);
+    xTaskCreate(_handle_interruption, "Handle button", 2048, NULL, 1, NULL);
 
     gpio_install_isr_service(0);
-    gpio_isr_handler_add(BTN, gpio_isr_handler, (void *) BTN);
+    gpio_isr_handler_add(BTN, _gpio_isr_handler, (void *) BTN);
 
+}
+
+// ================================ LOCAL FUNCTIONS ================================
+
+void _handle_interruption(void *params){
+    int pin;
+    int counter = 0;
+
+    while(true) {
+        if(xQueueReceive(interruption_queue, &pin, portMAX_DELAY)){
+            // De-bouncing
+            int state = gpio_get_level(pin);
+
+            if(state == 1){
+                gpio_isr_handler_remove(pin);
+                while(gpio_get_level(pin) == state){
+                    vTaskDelay(50 / portTICK_PERIOD_MS);
+                }
+
+                printf("BOTÃO PRESSIONADO %d vezes!\n", ++counter);
+                _toggle_led(); // TODO remove this
+
+                // Habilitar novamente a interrupção
+                vTaskDelay(50 / portTICK_PERIOD_MS);
+                gpio_isr_handler_add(pin, _gpio_isr_handler, (void *) pin);
+            }
+
+        }
+    }
+}
+
+static void IRAM_ATTR _gpio_isr_handler(void *args){
+  int pin = (int)args;
+  xQueueSendFromISR(interruption_queue, &pin, NULL);
+}
+
+void _toggle_led(){
+    led_state = !led_state;
+    gpio_set_level(LED, led_state);
 }
