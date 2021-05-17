@@ -2,35 +2,45 @@ import React, { createContext, useReducer, useContext } from 'react';
 
 import { DeviceReducer }  from './DeviceReducer'
 
-const DeviceContext = createContext()
+export const DeviceContext = createContext()
 
 const storage = localStorage.getItem('devices') ? JSON.parse(localStorage.getItem('device')) : []
 const initialState = { devices: storage }
 
 export default function DeviceContextProvider({children}) {
-    const [state, dispatch] = useReducer(DeviceReducer, initialState)
+  const [state, dispatch] = useReducer(DeviceReducer, initialState)
 
-    const addDevice = payload => {
-        dispatch({type: 'ADD_ITEM', payload})
-    }
+  const addDevice = payload => {
+    dispatch({type: 'ADD_ITEM', payload})
+  }
 
-    const contextValues = {
-        addDevice,
-        state
-    }
+  const toggleInDevice = payload => {
+    dispatch({type: 'TOGGLE_IN_DEVICE', payload})
+  }
 
-    return (
-        <DeviceContext.Provider value={contextValues} >
-            {children}
-        </DeviceContext.Provider>
-    )
+  const toggleOutDevice = payload => {
+    dispatch({type: 'TOGGLE_OUT_DEVICE', payload})
+  }
+
+  const contextValues = {
+    addDevice,
+    toggleInDevice,
+    toggleOutDevice,
+    ...state
+  }
+
+  return (
+    <DeviceContext.Provider value={contextValues} >
+        {children}
+    </DeviceContext.Provider>
+  )
 
 }
 
-export function useDevice(){
-    const context = useContext(DeviceContext)
+// export function useDevice(){
+//   const context = useContext(DeviceContext)
 
-    const { addDevice, state } = context;
+//   const { addDevice, state } = context;
 
-    return { addDevice, ...state }
-}
+//   return { addDevice, ...state }
+// }

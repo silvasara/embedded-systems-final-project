@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
-import { useDevice } from '../../contexts/DeviceContext'
+// import { useDevice } from '../../contexts/DeviceContext'
+import { DeviceContext } from '../../contexts/DeviceContext'
 
 import { Container } from './styles';
 
@@ -10,7 +11,10 @@ export default function Register() {
   const [inDevice, setInDevice] = useState('')
   const [outDevice, setOutDevice] = useState('')
 
-  const { addDevice, devices } = useDevice()
+  // const { addDevice, devices } = useDevice()
+  const { addDevice, devices } = useContext(DeviceContext)
+
+  const [mac, setId] = useState(0)
 
 
   const registerEsp = async(e) => {
@@ -23,11 +27,15 @@ export default function Register() {
     console.log('Room = ', room)
     console.log('In device  = ', inDevice)
     console.log('Out device = ', outDevice)
+    console.log('mac = ', mac)
 
     const payload = {
       room,
       inDevice,
-      outDevice
+      inDevicePressed: false,
+      outDevice,
+      outDevicePressed: false,
+      mac
     }
     addDevice(payload)
 

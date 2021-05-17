@@ -1,6 +1,4 @@
-
-
-import Device from './components/device'
+import DeviceList from './components/deviceList'
 import Register from './components/register'
 import GlobalStyles from './styles/GlobalStyles'
 
@@ -9,8 +7,8 @@ import DeviceContextProvider from './contexts/DeviceContext'
 function App() {
   return (
     <DeviceContextProvider>
-      <Register></Register>
-      <Device></Device>
+      <Register />
+      <DeviceList />
 
       <GlobalStyles />
     </DeviceContextProvider>

@@ -1,5 +1,27 @@
 import styled from 'styled-components'
 
-export const Container = styled.div`
+export const Title = styled.h1`
 
+
+`
+
+export const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+
+  button {
+    size: 50px;
+    border-radius: 10px;
+    margin-left: 10px;
+    background: ${props => (props.on === "true") ? "green" : "red"};
+  }
+`
+
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+
+  width: 70%;
+  /* align-items: center; */
 `
