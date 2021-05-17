@@ -1,0 +1,3 @@
+[submodule "client/components/esp32-DHT11"]
+	path = client/components/esp32-DHT11
+	url = https://github.com/icaropires/esp32-DHT11.git

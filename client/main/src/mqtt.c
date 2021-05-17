@@ -118,7 +118,7 @@ void mqtt_send_message(char *topic, char *message){
 
     cJSON *json = cJSON_CreateObject();
 
-    if (cJSON_AddStringToObject(json, "content", "TESTANDO 123") == NULL)
+    if (cJSON_AddStringToObject(json, "content", message) == NULL)
         goto end;
 
     payload = cJSON_Print(json);
