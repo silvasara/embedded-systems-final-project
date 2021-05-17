@@ -6,17 +6,12 @@ import { DeviceContext } from '../../contexts/DeviceContext'
 export default function Device({device}) {
   const { addDevice, devices, toggleInDevice, toggleOutDevice } = useContext(DeviceContext)
 
-  const handleToggleIn = async(e) => {
-    e.preventDefault()
-
-    // device.inDevicePressed = ! device.inDevicePressed;
-    console.log('clicado no in device... device antes: ', device)
-    toggleInDevice(device)
-  }
-
   return (
     <Container>
       <Title>{device.room ? device.room : "Cômodo sem nome"}</Title>
+
+      <span>Temperatura: {device.temperature}</span>
+      <span>Humidade: {device.humidity}</span>
 
       <Row on={device.inDevicePressed.toString()}>
       <span>Dispositivo entrada: {device.inDevice}</span>

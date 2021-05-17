@@ -25,9 +25,10 @@ export const Container = styled.div`
   }
 
   button {
-    width: 50%;
+    width: 20%;
     background: red;
-    margin-top: 5px;
+    margin-top: 2px;
+    margin-bottom: 10px;
     border-radius: 6px;
   }
 `

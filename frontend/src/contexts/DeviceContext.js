@@ -36,11 +36,3 @@ export default function DeviceContextProvider({children}) {
   )
 
 }
-
-// export function useDevice(){
-//   const context = useContext(DeviceContext)
-
-//   const { addDevice, state } = context;
-
-//   return { addDevice, ...state }
-// }

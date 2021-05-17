@@ -1,18 +1,18 @@
 import React, { useState, useContext } from 'react';
 
-// import { useDevice } from '../../contexts/DeviceContext'
 import { DeviceContext } from '../../contexts/DeviceContext'
 
 import { Container } from './styles';
 
 export default function Register() {
   const [espAvailable, setEspAvailable] = useState(false)
+  const [err, setErr] = useState('')
+
   const [room, setRoom] = useState('')
   const [inDevice, setInDevice] = useState('')
   const [outDevice, setOutDevice] = useState('')
 
-  // const { addDevice, devices } = useDevice()
-  const { addDevice, devices } = useContext(DeviceContext)
+  const { addDevice } = useContext(DeviceContext)
 
   const [mac, setId] = useState(0)
 
@@ -20,26 +20,31 @@ export default function Register() {
   const registerEsp = async(e) => {
     e.preventDefault()
 
-    setEspAvailable(!espAvailable)
+    setEspAvailable(true)
+    if (!espAvailable){
+      setErr('Não há um dispositivo disponível!')
+    } else if (!room) {
+      setErr('O nome do cômodo deve ser preenchido!')
+    } else {
+      setErr('')
 
-    console.log('Devices antes = ', devices)
+      console.log('Room = ', room)
+      console.log('In device  = ', inDevice)
+      console.log('Out device = ', outDevice)
+      console.log('mac = ', mac)
 
-    console.log('Room = ', room)
-    console.log('In device  = ', inDevice)
-    console.log('Out device = ', outDevice)
-    console.log('mac = ', mac)
-
-    const payload = {
-      room,
-      inDevice,
-      inDevicePressed: false,
-      outDevice,
-      outDevicePressed: false,
-      mac
+      const payload = {
+        room,
+        inDevice,
+        inDevicePressed: false,
+        outDevice,
+        outDevicePressed: false,
+        temperature: 0,
+        humidity: 0,
+        mac
+      }
+      addDevice(payload)
     }
-    addDevice(payload)
-
-    console.log('Devices dps = ', devices)
 
   }
 
@@ -53,11 +58,24 @@ export default function Register() {
       <input type="text" value={inDevice} onChange={e => setInDevice(e.target.value)} placeholder="Dispositivo de Entrada"></input>
       <input type="text" value={outDevice} onChange={e => setOutDevice(e.target.value)} placeholder="Dispositivo de Saída"></input>
       
-      <button onClick={e => registerEsp(e)}>CLICK ME</button>
+      <button onClick={e => registerEsp(e)}>REGISTRAR</button>
+      <Error error={err}/>
       
       
     </Container>
   );
+}
+
+function Error({error}) {
+  if(error){
+    return (
+      <>
+        <span>{error}</span>
+      </>
+    )
+  }
+
+  return <></>
 }
 
 function Title(props) {
