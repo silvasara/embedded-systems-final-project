@@ -4,6 +4,9 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "freertos/semphr.h"
+#include "driver/gpio.h"
+#include "dht11.h"
+
 
 #include "wifi.h"
 #include "mqtt.h"
@@ -24,8 +27,6 @@ Environ env;
 void wifi_connected(void *params){
     while(true){
         if(xSemaphoreTake(conn_wifi_semaphore, portMAX_DELAY)){
-            printf("Hello, word!\n");
-            printf("temp = %d humidity = %d\n", env.temp, env.humidity);
             mqtt_start();
         }
     }
@@ -36,10 +37,18 @@ void mqtt_connected(void *params){
 
     if(xSemaphoreTake(conn_mqtt_semaphore, portMAX_DELAY)){
         while(true){
-            float temp = 25.0;
+            struct dht11_reading environ = DHT11_read();
 
-            sprintf(msg, "temperature = %f", temp);
-            mqtt_send_message("sensors/temperature", msg);
+            if(environ.status < 0){
+                printf("Failed DHT11 reading with code %d\n", environ.status);
+                continue;
+            }
+
+            sprintf(msg, "%d", environ.temperature);
+            mqtt_send_message("fse2020/160144752/room/temperatura", msg);
+            
+            sprintf(msg, "%d", environ.humidity);
+            mqtt_send_message("fse2020/160144752/room/umidade", msg);
             vTaskDelay(2000 / portTICK_PERIOD_MS);
         }
     }
@@ -60,6 +69,7 @@ void app_main(void)
     conn_wifi_semaphore = xSemaphoreCreateBinary();
     conn_mqtt_semaphore = xSemaphoreCreateBinary();
     wifi_start();
+    DHT11_init(GPIO_NUM_4);
 
     set_up_gpio();
 
