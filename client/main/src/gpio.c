@@ -7,6 +7,9 @@
 #include "driver/gpio.h"
 
 #include "gpio.h"
+#include "mqtt.h"
+
+extern char room_name[100];
 
 xQueueHandle interruption_queue;
 int led_state = 0;
@@ -49,6 +52,8 @@ void set_up_gpio(){
 void _handle_interruption(void *params){
     int pin;
     int counter = 0;
+    char msg[50];
+    char topic[200];
 
     while(true) {
         if(xQueueReceive(interruption_queue, &pin, portMAX_DELAY)){
@@ -62,6 +67,11 @@ void _handle_interruption(void *params){
                 }
 
                 printf("BOTÃO PRESSIONADO %d vezes!\n", ++counter);
+                
+                sprintf(msg, "%d", state);
+                sprintf(topic, "fse2020/160144752/%s/estado", room_name);
+                mqtt_send_message(topic, msg);
+                
 
                 // Habilitar novamente a interrupção
                 vTaskDelay(50 / portTICK_PERIOD_MS);
