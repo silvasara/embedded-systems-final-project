@@ -11,6 +11,7 @@ export default function DeviceContextProvider({children}) {
   const [state, dispatch] = useReducer(DeviceReducer, initialState)
 
   const addDevice = payload => {
+    // payload contains device
     dispatch({type: 'ADD_ITEM', payload})
   }
 
@@ -19,7 +20,8 @@ export default function DeviceContextProvider({children}) {
   }
 
   const toggleInDevice = payload => {
-    const content = { inDevicePressed: !payload.inDevicePressed }
+    // payload contains mac and sensor -> bool
+    const content = { inDevicePressed: payload.sensor }
 
     dispatch({type: 'UPDATE', payload: {
       ...payload,
@@ -28,6 +30,7 @@ export default function DeviceContextProvider({children}) {
   }
 
   const toggleOutDevice = payload => {
+    //payload contains device
     const content = { outDevicePressed: !payload.outDevicePressed }
 
     dispatch({type: 'UPDATE', payload: {
@@ -37,6 +40,7 @@ export default function DeviceContextProvider({children}) {
   }
 
   const toggleAlarm = payload => {
+    //payload contains device
     const content = { alarmPressed: !payload.alarmPressed }
 
     dispatch({type: 'UPDATE', payload: {
@@ -46,6 +50,7 @@ export default function DeviceContextProvider({children}) {
   }
 
   const updateTemperature = payload => {
+    //payload contains mac and temperature->number
     const content = { temperature: payload.temperature}
 
     dispatch({type: 'UPDATE', payload: {
@@ -55,6 +60,7 @@ export default function DeviceContextProvider({children}) {
   }
 
   const updateHumidity = payload => {
+    //payload contains mac and humidity->number
     const content = { humidity: payload.humidity}
 
     dispatch({type: 'UPDATE', payload: {

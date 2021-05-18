@@ -4,7 +4,7 @@ import React, { useContext, useEffect } from 'react';
 import { DeviceContext } from '../../contexts/DeviceContext'
 
 export default function Receiver({ payload, setPayload }) {
-  const { updateTemperature, updateHumidity } = useContext(DeviceContext)
+  const { updateTemperature, updateHumidity, toggleInDevice } = useContext(DeviceContext)
 
   useEffect(() => {
     if (payload) {
@@ -18,6 +18,11 @@ export default function Receiver({ payload, setPayload }) {
       if (payload.humidity){
         console.log('New humidity received')
         updateHumidity(payload)
+      }
+
+      if (payload.sensor !== undefined){
+        console.log('In device state change!')
+        toggleInDevice(payload)
       }
 
     }
