@@ -15,21 +15,13 @@
 xSemaphoreHandle conn_wifi_semaphore;
 xSemaphoreHandle conn_mqtt_semaphore;
 
-char mac[18];
+extern char room_name[100];
+
 
 void wifi_connected(void *params){
     while(true){
         if(xSemaphoreTake(conn_wifi_semaphore, portMAX_DELAY)){
             mqtt_start();
-            get_mac((char *) mac);
-
-            char topic[100];
-            sprintf(topic, "fse2020/160144752/dispositivos/%s", mac);
-
-            char msg[50];
-            sprintf(msg, "%s", mac);
-
-            mqtt_send_message(topic, msg);
         }
     }
 }
@@ -45,10 +37,11 @@ void mqtt_connected(void *params){
                 printf("Failed DHT11 reading with code %d\n", environ.status);
                 continue;
             }
-
+            printf("@@@@@@@@@@@@@@@@\n");
+            printf("%s\n", room_name);
             sprintf(msg, "%d", environ.temperature);
             mqtt_send_message("fse2020/160144752/room/temperatura", msg);
-            
+
             sprintf(msg, "%d", environ.humidity);
             mqtt_send_message("fse2020/160144752/room/umidade", msg);
             vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -56,15 +49,14 @@ void mqtt_connected(void *params){
     }
 }
 
-void app_main(void)
-{
+void app_main(void){
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-      ESP_ERROR_CHECK(nvs_flash_erase());
-      ret = nvs_flash_init();
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-    
+
     conn_wifi_semaphore = xSemaphoreCreateBinary();
     conn_mqtt_semaphore = xSemaphoreCreateBinary();
     wifi_start();
