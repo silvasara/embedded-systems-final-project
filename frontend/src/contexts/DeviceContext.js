@@ -15,15 +15,48 @@ export default function DeviceContextProvider({children}) {
   }
 
   const toggleInDevice = payload => {
-    dispatch({type: 'TOGGLE_IN_DEVICE', payload})
+    const content = { inDevicePressed: !payload.inDevicePressed }
+
+    dispatch({type: 'UPDATE', payload: {
+      ...payload,
+      content
+    }})
   }
 
   const toggleOutDevice = payload => {
-    dispatch({type: 'TOGGLE_OUT_DEVICE', payload})
+    const content = { outDevicePressed: !payload.outDevicePressed }
+
+    dispatch({type: 'UPDATE', payload: {
+      ...payload,
+      content
+    }})
   }
 
   const toggleAlarm = payload => {
-    dispatch({type: 'TOGGLE_ALARM', payload})
+    const content = { alarmPressed: !payload.alarmPressed }
+
+    dispatch({type: 'UPDATE', payload: {
+      ...payload,
+      content
+    }})
+  }
+
+  const updateTemperature = payload => {
+    const content = { temperature: payload.temperature}
+
+    dispatch({type: 'UPDATE', payload: {
+      ...payload,
+      content
+    }})
+  }
+
+  const updateHumidity = payload => {
+    const content = { humidity: payload.humidity}
+
+    dispatch({type: 'UPDATE', payload: {
+      ...payload,
+      content
+    }})
   }
 
   const contextValues = {
@@ -31,6 +64,8 @@ export default function DeviceContextProvider({children}) {
     toggleInDevice,
     toggleOutDevice,
     toggleAlarm,
+    updateTemperature,
+    updateHumidity,
     ...state
   }
 

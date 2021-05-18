@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 
 import DeviceList from './components/deviceList'
 import Register from './components/register'
+import Receiver from './services/receiver'
+
 import GlobalStyles from './styles/GlobalStyles'
 
 import DeviceContextProvider from './contexts/DeviceContext'
@@ -10,9 +12,11 @@ import mqtt from 'mqtt'
 
 
 function App() {
-  // const [client, setClient] = useState(null)
-  const [mac, setMac] = useState('')
   const TOPIC_MAC = 'fse/front/160144752/mac'
+  const TOPIC_UPDATE = 'fse/front/160144752/update'
+
+  const [mac, setMac] = useState('')
+  const [payload, setPayload] = useState(null)
 
   const host = 'ws://mqtt.eclipseprojects.io/mqtt'
   var client = mqtt.connect(host)
@@ -23,6 +27,7 @@ function App() {
         console.log('Connected to broker')
 
         client.subscribe(TOPIC_MAC)
+        client.subscribe(TOPIC_UPDATE)
       });
       client.on('error', (err) => {
         console.error('Connection error: ', err);
@@ -37,8 +42,11 @@ function App() {
 
         switch(topic) {
           case TOPIC_MAC:
-            console.log('chegou no topic certo', obj.mac)
             setMac(obj.mac)
+            break
+
+          case TOPIC_UPDATE:
+            setPayload({topic, ...obj})
             break
 
           default:
@@ -53,6 +61,8 @@ function App() {
     <DeviceContextProvider>
       <Register mac={mac} setMac={setMac} />
       <DeviceList />
+
+      <Receiver payload={payload} setPayload={setPayload}/>
 
       <GlobalStyles />
     </DeviceContextProvider>
