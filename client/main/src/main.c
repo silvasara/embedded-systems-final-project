@@ -28,22 +28,30 @@ void wifi_connected(void *params){
 
 void mqtt_connected(void *params){
     char msg[50];
+    struct dht11_reading environ;
+    char topic[200];
 
     if(xSemaphoreTake(conn_mqtt_semaphore, portMAX_DELAY)){
         while(true){
-            struct dht11_reading environ = DHT11_read();
+           // environ = DHT11_read();
 
-            if(environ.status < 0){
-                printf("Failed DHT11 reading with code %d\n", environ.status);
-                continue;
-            }
-            printf("@@@@@@@@@@@@@@@@\n");
-            printf("%s\n", room_name);
-            sprintf(msg, "%d", environ.temperature);
-            mqtt_send_message("fse2020/160144752/room/temperatura", msg);
+           // if(environ.status < 0){
+           //     printf("Failed DHT11 reading with code %d\n", environ.status);
+           //     continue;
+           // }
 
-            sprintf(msg, "%d", environ.humidity);
-            mqtt_send_message("fse2020/160144752/room/umidade", msg);
+
+            //sprintf(msg, "%d", environ.temperature);
+            sprintf(msg, "%d", 300);
+            sprintf(topic, "fse2020/160144752/%s/temperatura", room_name);
+            mqtt_send_message(topic, msg);
+
+            //sprintf(msg, "%d", environ.humidity);
+            sprintf(msg, "%d", 1);
+            sprintf(topic, "fse2020/160144752/%s/umidade", room_name);
+            mqtt_send_message(topic, msg);
+
+
             vTaskDelay(2000 / portTICK_PERIOD_MS);
         }
     }

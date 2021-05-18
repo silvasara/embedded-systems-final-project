@@ -14,8 +14,12 @@ int32_t read_nvs(char *room_name){
     size_t required_size;
     nvs_get_str(partition_handle, ROOM_NVS_KEY, NULL, &required_size);
 
-    room_name = calloc(required_size, sizeof(char));
-    read_status = nvs_get_str(partition_handle, ROOM_NVS_KEY, room_name, &required_size);
+    char *name = calloc(required_size, sizeof(char));
+    read_status = nvs_get_str(partition_handle, ROOM_NVS_KEY, name, &required_size);
+
+    if (read_status == ESP_OK){
+        strcpy(room_name, name);
+    }
 
     nvs_close(partition_handle);
 

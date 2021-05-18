@@ -8,11 +8,11 @@ from broker import (
 
 
 client.loop_start()
-#subscribe(client, "fse2020/160144752/room/temperatura")
-#subscribe(client, "fse2020/160144752/room/umidade")
+subscribe(client, "fse2020/160144752/room/temperatura")
+subscribe(client, "fse2020/160144752/room/umidade")
 subscribe(client, "fse2020/160144752/dispositivos/#")
 publish(
     client,
     "fse2020/160144752/dispositivos/24:62:AB:E1:9B:3C",
-    json.dumps("socorro")
+    json.dumps({"content": "room"})
 )

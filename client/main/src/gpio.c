@@ -62,7 +62,6 @@ void _handle_interruption(void *params){
                 }
 
                 printf("BOTÃO PRESSIONADO %d vezes!\n", ++counter);
-                _toggle_led(); // TODO remove this
 
                 // Habilitar novamente a interrupção
                 vTaskDelay(50 / portTICK_PERIOD_MS);

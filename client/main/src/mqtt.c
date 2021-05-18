@@ -44,7 +44,6 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
     switch (event->event_id) {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-            //xSemaphoreGive(conn_mqtt_semaphore);
 
             char mac[18];
             get_mac((char *) mac);
@@ -58,6 +57,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
             mqtt_send_message(topic, msg);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             msg_id = esp_mqtt_client_subscribe(client, topic, 0);
+            xSemaphoreGive(conn_mqtt_semaphore);
 
             break;
 
@@ -79,7 +79,16 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
             printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
             printf("DATA=%.*s\r\n", event->data_len, event->data);
 
-            update_registered_rooms(room_name, event->data);
+            cJSON *data_json = cJSON_Parse(event->data);
+
+            const cJSON *name = NULL;
+
+            name = cJSON_GetObjectItemCaseSensitive(data_json, "content");
+            if (cJSON_IsString(name) && (name->valuestring != NULL))
+            {
+                update_registered_rooms(room_name, name->valuestring);
+            }
+
 
             break;
         case MQTT_EVENT_ERROR:
