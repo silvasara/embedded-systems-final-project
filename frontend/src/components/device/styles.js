@@ -10,8 +10,13 @@ export const SmallTitle = styled(Title)`
   color: black;
   font-size: 18px;
   margin-bottom: 5px;
+  margin-right: 5px;
+  color: ${props => props.color ? props.color : "black"};
+
 `
-export const ColoredText = styled.text`
+export const ColoredText = styled.h2`
+  margin-left: 5px;
+  font-size: 15px;
   color: ${props => props.color ? props.color : "white"};
 `
 
@@ -32,7 +37,8 @@ export const Container = styled.div`
   flex-direction: column;
   margin: auto;
   border: solid black 2px;
-
   width: 70%;
-  /* align-items: center; */
+
+  padding-left: 10px;
+  padding-bottom: 8px;
 `

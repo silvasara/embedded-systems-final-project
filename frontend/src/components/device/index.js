@@ -4,30 +4,39 @@ import { Container, Title, SmallTitle, ColoredText, Row } from './styles';
 import { DeviceContext } from '../../contexts/DeviceContext'
 
 export default function Device({device}) {
-  const { toggleOutDevice, toggleInDevice, toggleAlarm } = useContext(DeviceContext)
+  const { toggleOutDevice, toggleAlarm } = useContext(DeviceContext)
 
   return (
     <Container>
       <Title>{device.room ? device.room : "Cômodo sem nome"}</Title>
-      <SmallTitle>
-        Endereço MAC: <ColoredText color="yellow">{device.mac}</ColoredText>
-      </SmallTitle>
+      <Row>
+        <SmallTitle>Endereço MAC:</SmallTitle>
+        <SmallTitle color="yellow">{device.mac}</SmallTitle>
+      </Row>
 
-      <span>Temperatura: {device.temperature}</span>
-      <span>Humidade: {device.humidity}</span>
+      <Row>
+        <span>Temperatura:</span>
+        <ColoredText>{device.temperature}</ColoredText>
+      </Row>
 
+      <Row>
+        <span>Humidade:</span>
+        <ColoredText>{device.humidity}</ColoredText>
+      </Row>
 
       <Row on={device.outDevicePressed.toString()}>
-      <span>
-        Dispositivo saida: <ColoredText>{device.outDevice}</ColoredText>
-      </span>
+        <Row>
+          <span>Dispositivo saida:</span>
+          <ColoredText>{device.outDevice}</ColoredText>
+        </Row>
       <button onClick={() => toggleOutDevice(device)}>{device.outDevicePressed? "ON" : "OFF"}</button>
       </Row>
 
       <Row on={device.inDevicePressed.toString()}>
-      <span>
-        Dispositivo entrada: <ColoredText>{device.inDevice}</ColoredText>
-      </span>
+        <Row>
+          <span>Dispositivo entrada:</span>
+          <ColoredText>{device.inDevice}</ColoredText>
+        </Row>
       {/* onClick={() => toggleInDevice(device)} */}
       <button>{device.inDevicePressed? "PRESENTE" : "AUSENTE"}</button>
       </Row>

@@ -6,6 +6,7 @@ export const DeviceReducer = (state, action) => {
   switch (action.type) {
     case 'ADD_ITEM':
       state.devices.push(action.payload) 
+      Storage(state.devices)
       return {...state}
 
     case 'TOGGLE_IN_DEVICE':
@@ -18,6 +19,7 @@ export const DeviceReducer = (state, action) => {
       const newDevices = [...state.devices]
       newDevices[idx] = {...newDevices[idx], inDevicePressed: !newDevices[idx].inDevicePressed}
 
+      Storage(newDevices)
       return {devices: newDevices}
 
     case 'TOGGLE_OUT_DEVICE':
@@ -30,6 +32,7 @@ export const DeviceReducer = (state, action) => {
       const newArr = [...state.devices]
       newArr[outIdx] = {...newArr[outIdx], outDevicePressed: !newArr[outIdx].outDevicePressed}
 
+      Storage(newArr)
       return {devices: newArr}
 
     case 'TOGGLE_ALARM':
@@ -42,8 +45,11 @@ export const DeviceReducer = (state, action) => {
       const alarmArr = [...state.devices]
       alarmArr[alarmIdx] = {...alarmArr[alarmIdx], alarmPressed: !alarmArr[alarmIdx].alarmPressed}
 
+      Storage(alarmArr)
       return {devices: alarmArr}
 
+    case 'CLEAR':
+      return state
 
     default:
       return state

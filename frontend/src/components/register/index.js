@@ -5,7 +5,6 @@ import { DeviceContext } from '../../contexts/DeviceContext'
 import { Container, Header, ErrorMessage } from './styles';
 
 export default function Register({ mac, setMac }) {
-  const [espAvailable, setEspAvailable] = useState(false)
   const [err, setErr] = useState('')
 
   const [room, setRoom] = useState('')
@@ -14,13 +13,9 @@ export default function Register({ mac, setMac }) {
 
   const { addDevice } = useContext(DeviceContext)
 
-  // const [mac, setId] = useState(0)
-
-
   const registerEsp = async(e) => {
     e.preventDefault()
 
-    setEspAvailable(true)
     if (!mac){
       setErr('Não há um dispositivo disponível!')
     } else if (!room) {

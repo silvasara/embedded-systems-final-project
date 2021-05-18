@@ -4,7 +4,7 @@ import { DeviceReducer }  from './DeviceReducer'
 
 export const DeviceContext = createContext()
 
-const storage = localStorage.getItem('devices') ? JSON.parse(localStorage.getItem('device')) : []
+const storage = localStorage.getItem('devices') ? JSON.parse(localStorage.getItem('devices')) : []
 const initialState = { devices: storage }
 
 export default function DeviceContextProvider({children}) {
