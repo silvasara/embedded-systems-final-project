@@ -5,14 +5,44 @@ import { FaTrashAlt } from 'react-icons/fa'
 
 import { DeviceContext } from '../../contexts/DeviceContext'
 
-export default function Device({device}) {
+export default function Device({device, publish}) {
   const { toggleOutDevice, toggleAlarm, removeDevice } = useContext(DeviceContext)
+
+  const DELETE_TOPIC = 'fse/central/160144752/delete'
+  const UPDATE_TOPIC = 'fse/central/160144752/update'
 
   const handleTrashButton = async(e) => {
     e.preventDefault()
 
+    console.log(device.mac, 'deleted')
+    publish(DELETE_TOPIC, JSON.stringify(device))
     removeDevice(device)
-    console.log('enviando msg pro central...')
+  }
+
+  const handleToggleOutDevice = async(e) => {
+    e.preventDefault()
+
+    console.log(device.mac, 'led toggled')
+    const payload = {
+      action: 'led',
+      command: `${device.outDevicePressed? 'Desligado': 'Ligado'} ${device.outDevice}`,
+      mac: device.mac
+    }
+    publish(UPDATE_TOPIC, JSON.stringify(payload))
+    toggleOutDevice(device)
+  }
+
+  const handleToggleAlarm = async(e) => {
+    e.preventDefault()
+
+    console.log(device.mac, 'alarm toggled')
+    const payload = {
+      action: 'alarm',
+      command: `${device.alarmPressed? 'Desligado': 'Ligado'} alarme`,
+      mac: device.mac
+    }
+    publish(UPDATE_TOPIC, JSON.stringify(payload))
+    toggleAlarm(device)
   }
 
   return (
@@ -41,7 +71,7 @@ export default function Device({device}) {
           <span>Dispositivo saida:</span>
           <ColoredText>{device.outDevice}</ColoredText>
         </Row>
-      <Button on={device.outDevicePressed.toString()} onClick={() => toggleOutDevice(device)}>{device.outDevicePressed? "ON" : "OFF"}</Button>
+      <Button on={device.outDevicePressed.toString()} onClick={e => handleToggleOutDevice(e)}>{device.outDevicePressed? "ON" : "OFF"}</Button>
       </Row>
 
       <Row>
@@ -55,7 +85,7 @@ export default function Device({device}) {
 
       <Row>
       <span>Alarme</span>
-      <Button on={device.alarmPressed.toString()} onClick={() => toggleAlarm(device)}>{device.alarmPressed? "ON" : "OFF"}</Button>
+      <Button on={device.alarmPressed.toString()} onClick={e => handleToggleAlarm(e)}>{device.alarmPressed? "ON" : "OFF"}</Button>
       </Row>
 
 

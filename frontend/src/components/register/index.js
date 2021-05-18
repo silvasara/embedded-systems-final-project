@@ -4,7 +4,9 @@ import { DeviceContext } from '../../contexts/DeviceContext'
 
 import { Container, Header, ErrorMessage } from './styles';
 
-export default function Register({ mac, setMac }) {
+export default function Register({ mac, setMac, publish }) {
+  const CREATE_TOPIC = 'fse/central/160144752/create'
+
   const [err, setErr] = useState('')
 
   const [room, setRoom] = useState('')
@@ -44,6 +46,7 @@ export default function Register({ mac, setMac }) {
         mac
       }
       addDevice(payload)
+      publish(CREATE_TOPIC, JSON.stringify(payload))
     }
 
   }

@@ -56,11 +56,16 @@ function App() {
     }
   }, [client, mac]);
 
+  const mqttPublish = (topic, message) => {
+    if (client){
+      client.publish(topic, message, {qos: 2})
+    }
+  }
 
   return (
     <DeviceContextProvider>
-      <Register mac={mac} setMac={setMac} />
-      <DeviceList />
+      <Register mac={mac} setMac={setMac} publish={mqttPublish}/>
+      <DeviceList publish={mqttPublish} />
 
       <Receiver payload={payload} setPayload={setPayload}/>
 

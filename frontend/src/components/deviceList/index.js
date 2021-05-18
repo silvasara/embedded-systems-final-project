@@ -6,14 +6,13 @@ import { DeviceContext } from '../../contexts/DeviceContext'
 
 import Device from '../device' 
 
-export default function DeviceList() {
-  // const { addDevice, devices } = useDevice()
+export default function DeviceList({publish}) {
   const { devices } = useContext(DeviceContext)
 
   return (
     <Container>
       {
-        devices.map(device => <Device key={device.mac} device={device}></Device>)
+        devices.map(device => <Device key={device.mac} device={device} publish={publish}></Device>)
       }
     </Container>
   );
