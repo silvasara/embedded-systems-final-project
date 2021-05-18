@@ -20,7 +20,8 @@ export const Container = styled.div`
   }
 
   span {
-    color: white;
+    margin-top: 5px;
+    color: whitesmoke;
     /* background: var(--aux-color); */
   }
 
@@ -31,4 +32,14 @@ export const Container = styled.div`
     margin-bottom: 10px;
     border-radius: 6px;
   }
+`
+export const Header = styled.h1`
+  color: white;
+  font-size: 20px;
+  margin-bottom: 5px;
+`
+
+export const ErrorMessage = styled.h1`
+  color: black;
+  font-size: 15px;
 `

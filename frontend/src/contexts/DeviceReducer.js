@@ -32,6 +32,18 @@ export const DeviceReducer = (state, action) => {
 
       return {devices: newArr}
 
+    case 'TOGGLE_ALARM':
+      const alarmIdx = state.devices.findIndex(item => item.mac === action.payload.mac)
+      if(alarmIdx === -1){
+        console.log("Error: outDevice not found")
+        return {...state}
+      }
+
+      const alarmArr = [...state.devices]
+      alarmArr[alarmIdx] = {...alarmArr[alarmIdx], alarmPressed: !alarmArr[alarmIdx].alarmPressed}
+
+      return {devices: alarmArr}
+
 
     default:
       return state

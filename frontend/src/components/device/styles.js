@@ -1,8 +1,18 @@
 import styled from 'styled-components'
 
 export const Title = styled.h1`
+  color: black;
+  font-size: 30px;
 
+`
 
+export const SmallTitle = styled(Title)`
+  color: black;
+  font-size: 18px;
+  margin-bottom: 5px;
+`
+export const ColoredText = styled.text`
+  color: ${props => props.color ? props.color : "white"};
 `
 
 export const Row = styled.div`

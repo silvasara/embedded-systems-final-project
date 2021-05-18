@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useContext } from 'react';
+import React, { createContext, useReducer } from 'react';
 
 import { DeviceReducer }  from './DeviceReducer'
 
@@ -22,10 +22,15 @@ export default function DeviceContextProvider({children}) {
     dispatch({type: 'TOGGLE_OUT_DEVICE', payload})
   }
 
+  const toggleAlarm = payload => {
+    dispatch({type: 'TOGGLE_ALARM', payload})
+  }
+
   const contextValues = {
     addDevice,
     toggleInDevice,
     toggleOutDevice,
+    toggleAlarm,
     ...state
   }
 

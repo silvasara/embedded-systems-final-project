@@ -2,9 +2,9 @@ import React, { useState, useContext } from 'react';
 
 import { DeviceContext } from '../../contexts/DeviceContext'
 
-import { Container } from './styles';
+import { Container, Header, ErrorMessage } from './styles';
 
-export default function Register() {
+export default function Register({ mac, setMac }) {
   const [espAvailable, setEspAvailable] = useState(false)
   const [err, setErr] = useState('')
 
@@ -14,19 +14,23 @@ export default function Register() {
 
   const { addDevice } = useContext(DeviceContext)
 
-  const [mac, setId] = useState(0)
+  // const [mac, setId] = useState(0)
 
 
   const registerEsp = async(e) => {
     e.preventDefault()
 
     setEspAvailable(true)
-    if (!espAvailable){
+    if (!mac){
       setErr('Não há um dispositivo disponível!')
     } else if (!room) {
       setErr('O nome do cômodo deve ser preenchido!')
     } else {
       setErr('')
+      setMac('')
+      setRoom('')
+      setInDevice('')
+      setOutDevice('')
 
       console.log('Room = ', room)
       console.log('In device  = ', inDevice)
@@ -39,6 +43,7 @@ export default function Register() {
         inDevicePressed: false,
         outDevice,
         outDevicePressed: false,
+        alarmPressed: false,
         temperature: 0,
         humidity: 0,
         mac
@@ -50,13 +55,16 @@ export default function Register() {
 
   return (
     <Container>
-      <Title hasEsp={espAvailable}></Title>
+      <Title mac={mac}></Title>
 
-      <br></br>
-
+      <span>Cômodo da casa</span>
       <input type="text" value={room} onChange={e => setRoom(e.target.value)} placeholder="Cômodo da casa" ></input>
-      <input type="text" value={inDevice} onChange={e => setInDevice(e.target.value)} placeholder="Dispositivo de Entrada"></input>
+
+      <span>Dispositivo de Saída</span>
       <input type="text" value={outDevice} onChange={e => setOutDevice(e.target.value)} placeholder="Dispositivo de Saída"></input>
+
+      <span>Dispositivo de entrada</span>
+      <input type="text" value={inDevice} onChange={e => setInDevice(e.target.value)} placeholder="Dispositivo de Entrada"></input>
       
       <button onClick={e => registerEsp(e)}>REGISTRAR</button>
       <Error error={err}/>
@@ -70,7 +78,7 @@ function Error({error}) {
   if(error){
     return (
       <>
-        <span>{error}</span>
+        <ErrorMessage>{error}</ErrorMessage>
       </>
     )
   }
@@ -78,17 +86,17 @@ function Error({error}) {
   return <></>
 }
 
-function Title(props) {
-  if(props.hasEsp){
+function Title({mac}) {
+  if(mac){
     return (
       <>
-        <span>ESP disponível para cadastro!</span>
-        <span>MAC Address: </span>
+        <Header>ESP disponível para cadastro!</Header>
+        <Header>MAC Address: {mac}</Header>
       </>
     )
   }
 
   return (
-    <span>Aguardando conexão do dispositivo...</span>
+    <Header>Aguardando conexão do dispositivo...</Header>
   )
 }
