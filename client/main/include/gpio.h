@@ -5,5 +5,6 @@
 #define LED 2
 
 void set_up_gpio();
+void _toggle_led();
 
 #endif

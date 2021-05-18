@@ -33,24 +33,20 @@ void mqtt_connected(void *params){
 
     if(xSemaphoreTake(conn_mqtt_semaphore, portMAX_DELAY)){
         while(true){
-           // environ = DHT11_read();
+            environ = DHT11_read();
 
-           // if(environ.status < 0){
-           //     printf("Failed DHT11 reading with code %d\n", environ.status);
-           //     continue;
-           // }
+            if(environ.status < 0){
+                printf("Failed DHT11 reading with code %d\n", environ.status);
+                continue;
+            }
 
-
-            //sprintf(msg, "%d", environ.temperature);
-            sprintf(msg, "%d", 300);
+            sprintf(msg, "%d", environ.temperature);
             sprintf(topic, "fse2020/160144752/%s/temperatura", room_name);
             mqtt_send_message(topic, msg);
 
-            //sprintf(msg, "%d", environ.humidity);
-            sprintf(msg, "%d", 1);
+            sprintf(msg, "%d", environ.humidity);
             sprintf(topic, "fse2020/160144752/%s/umidade", room_name);
             mqtt_send_message(topic, msg);
-
 
             vTaskDelay(2000 / portTICK_PERIOD_MS);
         }

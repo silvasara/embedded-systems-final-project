@@ -23,6 +23,7 @@
 #include "mqtt.h"
 #include "cJSON.h"
 #include "registration.h"
+#include "gpio.h"
 
 #define TAG "MQTT"
 
@@ -37,19 +38,21 @@ static void log_error_if_nonzero(const char *message, int error_code)
     }
 }
 
+char topic_room[200];
+
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
 
     int msg_id;
+    char mac[18];
+    get_mac((char *) mac);
+    char topic[100];
+
+    sprintf(topic, "fse2020/160144752/dispositivos/%s", mac);
 
     switch (event->event_id) {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
 
-            char mac[18];
-            get_mac((char *) mac);
-            char topic[100];
-
-            sprintf(topic, "fse2020/160144752/dispositivos/%s", mac);
 
             char msg[50];
             sprintf(msg, "%s", mac);
@@ -57,7 +60,6 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
             mqtt_send_message(topic, msg);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             msg_id = esp_mqtt_client_subscribe(client, topic, 0);
-            xSemaphoreGive(conn_mqtt_semaphore);
 
             break;
 
@@ -78,16 +80,37 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
             ESP_LOGI(TAG, "MQTT_EVENT_DATA");
             printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
             printf("DATA=%.*s\r\n", event->data_len, event->data);
+            
+            char event_topic[200];
+            memcpy(event_topic, event->topic, event->topic_len);
+            event_topic[event->topic_len] = 0; 
+            
+            if (strcmp(event_topic, topic) == 0){
+                cJSON *data_json = cJSON_Parse(event->data);
+                const cJSON *name = NULL;
 
-            cJSON *data_json = cJSON_Parse(event->data);
-
-            const cJSON *name = NULL;
-
-            name = cJSON_GetObjectItemCaseSensitive(data_json, "content");
-            if (cJSON_IsString(name) && (name->valuestring != NULL))
-            {
-                update_registered_rooms(room_name, name->valuestring);
+                name = cJSON_GetObjectItemCaseSensitive(data_json, "content");
+                if (cJSON_IsString(name) && (name->valuestring != NULL)){
+                    update_registered_rooms(room_name, name->valuestring);
+                }
+                xSemaphoreGive(conn_mqtt_semaphore);
+                sprintf(topic_room, "fse2020/160144752/%s", room_name);
+                
+                msg_id = esp_mqtt_client_subscribe(client, topic_room, 0);
             }
+            
+            if (strcmp(event_topic, topic_room) == 0){
+                cJSON *data_json = cJSON_Parse(event->data);
+                const cJSON *name = NULL;
+
+                name = cJSON_GetObjectItemCaseSensitive(data_json, "action");
+                if (cJSON_IsString(name) && (name->valuestring != NULL)){
+                    if(strcmp(name->valuestring, "led") == 0){
+                        _toggle_led();
+                    }
+                }
+            }
+            
 
 
             break;
