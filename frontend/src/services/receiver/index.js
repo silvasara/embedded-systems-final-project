@@ -7,7 +7,7 @@ export default function Receiver({ payload, setPayload }) {
   const { updateTemperature, updateHumidity } = useContext(DeviceContext)
 
   useEffect(() => {
-    if (payload.topic) {
+    if (payload) {
       console.log('Nova mensagem recebida: ', payload)
 
       if (payload.temperature){

@@ -20,16 +20,25 @@ export const ColoredText = styled.h2`
   color: ${props => props.color ? props.color : "white"};
 `
 
+export const Trash = styled.button`
+  background: transparent;
+  border: none;
+  font-size: 1em;
+  padding-top: 5px;
+
+  margin-left: 10px;
+`
+
+export const Button = styled.button`
+  size: 50px;
+  border-radius: 10px;
+  margin-left: 10px;
+  background: ${props => (props.on === "true") ? "green" : "red"};
+`
+
 export const Row = styled.div`
   display: flex;
   flex-direction: row;
-
-  button {
-    size: 50px;
-    border-radius: 10px;
-    margin-left: 10px;
-    background: ${props => (props.on === "true") ? "green" : "red"};
-  }
 `
 
 export const Container = styled.div`

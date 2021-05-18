@@ -1,14 +1,26 @@
 import React, { useContext } from 'react';
 
-import { Container, Title, SmallTitle, ColoredText, Row } from './styles';
+import { Container, Title, SmallTitle, ColoredText, Row, Trash, Button } from './styles';
+import { FaTrashAlt } from 'react-icons/fa'
+
 import { DeviceContext } from '../../contexts/DeviceContext'
 
 export default function Device({device}) {
-  const { toggleOutDevice, toggleAlarm } = useContext(DeviceContext)
+  const { toggleOutDevice, toggleAlarm, removeDevice } = useContext(DeviceContext)
+
+  const handleTrashButton = async(e) => {
+    e.preventDefault()
+
+    removeDevice(device)
+    console.log('enviando msg pro central...')
+  }
 
   return (
     <Container>
-      <Title>{device.room ? device.room : "Cômodo sem nome"}</Title>
+      <Row>
+        <Title>{device.room ? device.room : "Cômodo sem nome"}</Title>
+        <Trash onClick={e => handleTrashButton(e)}><FaTrashAlt/></Trash>
+      </Row>
       <Row>
         <SmallTitle>Endereço MAC:</SmallTitle>
         <SmallTitle color="yellow">{device.mac}</SmallTitle>
@@ -24,26 +36,26 @@ export default function Device({device}) {
         <ColoredText>{device.humidity}</ColoredText>
       </Row>
 
-      <Row on={device.outDevicePressed.toString()}>
+      <Row>
         <Row>
           <span>Dispositivo saida:</span>
           <ColoredText>{device.outDevice}</ColoredText>
         </Row>
-      <button onClick={() => toggleOutDevice(device)}>{device.outDevicePressed? "ON" : "OFF"}</button>
+      <Button on={device.outDevicePressed.toString()} onClick={() => toggleOutDevice(device)}>{device.outDevicePressed? "ON" : "OFF"}</Button>
       </Row>
 
-      <Row on={device.inDevicePressed.toString()}>
+      <Row>
         <Row>
           <span>Dispositivo entrada:</span>
           <ColoredText>{device.inDevice}</ColoredText>
         </Row>
       {/* onClick={() => toggleInDevice(device)} */}
-      <button>{device.inDevicePressed? "PRESENTE" : "AUSENTE"}</button>
+      <Button on={device.inDevicePressed.toString()}>{device.inDevicePressed? "PRESENTE" : "AUSENTE"}</Button>
       </Row>
 
-      <Row on={device.alarmPressed.toString()}>
+      <Row>
       <span>Alarme</span>
-      <button onClick={() => toggleAlarm(device)}>{device.alarmPressed? "ON" : "OFF"}</button>
+      <Button on={device.alarmPressed.toString()} onClick={() => toggleAlarm(device)}>{device.alarmPressed? "ON" : "OFF"}</Button>
       </Row>
 
 

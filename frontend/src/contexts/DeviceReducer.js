@@ -22,8 +22,11 @@ export const DeviceReducer = (state, action) => {
       Storage(newArr)
       return {devices: newArr}
 
-    case 'CLEAR':
-      return state
+    case 'REMOVE_ITEM':
+      const filteredItems = [...state.devices.filter(item => item.mac !== action.payload.mac)]
+
+      Storage(filteredItems)
+      return {devices: filteredItems}
 
     default:
       return state

@@ -14,6 +14,10 @@ export default function DeviceContextProvider({children}) {
     dispatch({type: 'ADD_ITEM', payload})
   }
 
+  const removeDevice = payload => {
+    dispatch({type: 'REMOVE_ITEM', payload})
+  }
+
   const toggleInDevice = payload => {
     const content = { inDevicePressed: !payload.inDevicePressed }
 
@@ -66,6 +70,7 @@ export default function DeviceContextProvider({children}) {
     toggleAlarm,
     updateTemperature,
     updateHumidity,
+    removeDevice,
     ...state
   }
 
