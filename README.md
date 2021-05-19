@@ -70,7 +70,7 @@ $ idf.py -p /dev/ttyUSB0 flash monitor
 Com o front e o central iniciados, ao iniciar o cliente, será identificado o MAC address da ESP e enviado para o servidor central.
 
 
-![mac_inicial](images/mac.png)
+![mac_inicial](images/mac_inicial.png)
 
 
 Recebido o MAC, é possível cadastrar o dispositivo
