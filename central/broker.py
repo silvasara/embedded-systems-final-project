@@ -1,10 +1,7 @@
-import controller
-import constants
 import json
+import constants
 from paho.mqtt import client as mqtt_client
-
-
-broker = 'mqtt.eclipseprojects.io'
+from handlers import esp_handler, front_handler
 
 
 def connect_mqtt() -> mqtt_client:
@@ -29,7 +26,7 @@ def connect_mqtt() -> mqtt_client:
     client = mqtt_client.Client(client_id="fse-top-pyclientv1.0.0")
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
-    client.connect(broker, 1883, 60)
+    client.connect(constants.BROKER, 1883, 60)
     return client
 
 
@@ -38,23 +35,43 @@ def subscribe(client: mqtt_client, topic):
         print(f"Received new message from `{msg.topic}` topic")
         data = json.loads(msg.payload)
 
-        if 'dispositivos' in msg.topic:
-            mac = msg.topic.split('/')[-1]
-            device = controller.init_device(mac)
+        # MESSAGES FROM ESP32
+        if "dispositivos" in msg.topic:
+            mac = msg.topic.split("/")[-1]
+            device = esp_handler.init_device(mac)
             if device:
                 publish(
                     client,
                     constants.FRONT_TOPIC_MAC,
-                    json.dumps({'mac': mac})
+                    json.dumps({"mac": mac})
                 )
 
+        elif "temperatura" in msg.topic:
+            room = msg.topic.split("/")[-2]
+
+        # MESSAGES FROM FRONTEND
         elif msg.topic == constants.CREATE_TOPIC:
-            device = controller.create_device(data)
+            device = front_handler.create_device(data)
             if device:
-                # publish(client, constants.)
-                ...
+                url = constants.DEVICES_TOPIC[:-1] + device["mac"]
+                room = device["room"]
+
+                subscribe(client, f"fse2020/160144752/{room}/temperatura")
+                subscribe(client, f"fse2020/160144752/{room}/umidade")
+                subscribe(client, f"fse2020/160144752/{room}/estado")
+                publish(
+                    client,
+                    url,
+                    json.dumps({"room": room})
+                )
+
         elif msg.topic == constants.UPDATE_TOPIC:
-            controller.update_device(data)
+            front_handler.update_device(data)
+
+        elif msg.topic == constants.DELETE_TOPIC:
+            deleted = front_handler.delete_device(data)
+            if deleted:
+                ...  # publish to reset esp
 
     client.subscribe(topic)
     client.on_message = on_message
@@ -64,6 +81,6 @@ def publish(client, topic, msg):
     result = client.publish(topic, msg)
     status = result[0]
     if status == 0:
-        print(f"Send msg to topic `{topic}`")
+        print(f"Sent msg to topic `{topic}`")
     else:
         print(f"Failed to send message to topic {topic}")

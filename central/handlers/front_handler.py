@@ -1,12 +1,5 @@
-devices = dict()
-
-
-def init_device(mac):
-    if mac in devices:
-        print('Device already initialized')
-        return None
-
-    return mac
+from utils import validate_keys
+from handlers import devices
 
 
 def create_device(body):
@@ -15,13 +8,24 @@ def create_device(body):
         print('Error when creating device: invalid body')
         return None
 
-    if body['mac'] in devices:
+    mac = body['mac']
+    if mac in devices:
         print('Error: device already exists')
         return None
 
-    devices[body['mac']] = body
-
+    devices[mac] = body
+    print(f'Device {mac} added')
     return body
+
+
+def delete_device(body):
+    mac = body['mac']
+    if mac in devices:
+        del devices[mac]
+        print(f'Device {mac} deleted')
+        return True
+
+    return False
 
 
 def update_device(body):
@@ -44,11 +48,7 @@ def update_device(body):
     elif action == 'led':
         devices[mac]['outDevicePressed'] = not devices[mac]['outDevicePressed']
 
+    # response = {
+    #     'action': action
+    # }
     return devices[mac]
-
-
-def validate_keys(body, keys):
-    if not all(k in body for k in keys):
-        return False
-
-    return True
