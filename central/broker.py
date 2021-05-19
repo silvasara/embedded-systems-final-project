@@ -49,6 +49,13 @@ def subscribe(client: mqtt_client, topic):
 
         elif "temperatura" in msg.topic:
             room = msg.topic.split("/")[-2]
+            temperature = esp_handler.update_temperature(room, data)
+            if temperature:
+                publish(
+                    client,
+                    constants.FRONT_TOPIC_UPDATE,
+                    json.dumps(temperature)
+                )
 
         # MESSAGES FROM FRONTEND
         elif msg.topic == constants.CREATE_TOPIC:
@@ -79,7 +86,7 @@ def subscribe(client: mqtt_client, topic):
 
 
 def publish(client, topic, msg):
-    result = client.publish(topic, msg)
+    result = client.publish(topic, msg, qos=2)
     status = result[0]
     if status == 0:
         print(f"Sent msg to topic `{topic}`")

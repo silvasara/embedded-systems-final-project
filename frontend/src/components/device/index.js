@@ -62,7 +62,7 @@ export default function Device({device, publish}) {
       </Row>
 
       <Row>
-        <span>Humidade:</span>
+        <span>Umidade:</span>
         <ColoredText>{device.humidity}</ColoredText>
       </Row>
 

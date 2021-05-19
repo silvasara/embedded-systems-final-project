@@ -1,4 +1,4 @@
-from utils import validate_keys
+from utils import validate_keys, build_valid_room
 from handlers import devices
 
 
@@ -12,6 +12,8 @@ def create_device(body):
     if mac in devices:
         print('Error: device already exists')
         return None
+
+    body['room'] = build_valid_room(body['room'])
 
     devices[mac] = body
     print(f'Device {mac} added')
