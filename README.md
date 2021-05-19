@@ -1,5 +1,12 @@
 # Projeto Final - Fundamentos de Sistemas Embarcados
 
+## Alunos
+
+| Aluno | Matrícula |
+| --- | --- |
+| Rômulo Souza | 15/0147601 |
+| Sara Silva | 16/0144752 |
+
 ## Introdução
 
 O objetivo deste trabalho é criar um sistema distribuído de automação residencial utilizando um computador (PC) como sistema computacional central e placas ESP32 como controladores distribuídos, interconectados via Wifi através do protocolo MQTT. O projeto consite em três módulos:
@@ -81,11 +88,11 @@ Recebido o MAC, é possível cadastrar o dispositivo
 
 * Cadastrar/remover dispositivos
 
-* Pressionar o botão do dispositívo de saída no menu irá alterar o estado do LED
+* Pressionar o botão do dispositivo de saída no menu irá alterar o estado do LED
 
 * Pressionar o botão do alarme no menu irá alterar seu estado
 
-* Pressionar o botão boot na esp irá alterar o estado do dispositivo de entrada (caso o alarme esteja ativado, também será tocado um alarme)
+* Pressionar o botão boot na esp irá alterar o estado do dispositivo de entrada (caso o alarme esteja ativado, também será tocado um aviso sonoro)
 
 * Pressionar e segurar por 5s o botão boot na esp irá reiniciá-la, reiniciando também as configurações do servidor central e front
 
