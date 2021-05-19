@@ -12,6 +12,7 @@
 
 #include "gpio.h"
 #include "mqtt.h"
+#include "registration.h"
 
 #ifndef CONFIG_LOW_POWER
 #define CONFIG_LOW_POWER 0
@@ -59,15 +60,20 @@ void set_up_gpio(){
     if(LOW_POWER){
         char topic[200];
         char msg[50];
+        char room[100];
         rtc_gpio_pullup_en(BTN);
         rtc_gpio_pulldown_dis(BTN);
         esp_sleep_enable_ext0_wakeup(BTN, 0);
 
         printf("Acordou %d vezes \n", Acordou++);
 
-        sprintf(msg, "%s", "acionado");
-        sprintf(topic, "fse2020/160144752/%s/estado", room_name);
-        mqtt_send_message(topic, msg);
+        room[0] = '\0';
+        read_nvs(room);
+        if (strlen(room) != 0){
+            sprintf(topic, "fse2020/160144752/%s/estado", room);
+            sprintf(msg, "%s", "acionado");
+            mqtt_send_message(topic, msg);
+        }
 
         printf("Entrando em modo Deep Sleep\n");
 

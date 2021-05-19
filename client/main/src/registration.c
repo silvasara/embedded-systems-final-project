@@ -18,7 +18,6 @@ int32_t read_nvs(char *room_name){
     read_status = nvs_get_str(partition_handle, ROOM_NVS_KEY, name, &required_size);
 
     if (read_status == ESP_OK){
-        printf("################\n");
         strcpy(room_name, name);
     }
 

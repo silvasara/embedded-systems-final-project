@@ -71,7 +71,6 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
             read_nvs(room);
             if (strlen(room) != 0){
                 sprintf(topic_room, "fse2020/160144752/%s", room);
-                printf("%s\n", topic_room);
                 esp_mqtt_client_subscribe(client, topic_room, 0);
             }
 
