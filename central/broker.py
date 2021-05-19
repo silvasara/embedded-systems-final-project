@@ -1,5 +1,6 @@
 import json
 import constants
+from utils import build_valid_room
 from paho.mqtt import client as mqtt_client
 from handlers import esp_handler, front_handler
 
@@ -54,7 +55,7 @@ def subscribe(client: mqtt_client, topic):
             device = front_handler.create_device(data)
             if device:
                 url = constants.DEVICES_TOPIC[:-1] + device["mac"]
-                room = device["room"]
+                room = build_valid_room(device["room"])
 
                 subscribe(client, f"fse2020/160144752/{room}/temperatura")
                 subscribe(client, f"fse2020/160144752/{room}/umidade")
