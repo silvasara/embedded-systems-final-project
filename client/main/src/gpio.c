@@ -49,12 +49,17 @@ void set_up_gpio(){
 }
 
 // ================================ LOCAL FUNCTIONS ================================
-
 void _handle_interruption(void *params){
     int pin;
     int counter = 0;
     char msg[50];
     char topic[200];
+
+    char mac[18];
+    get_mac((char *) mac);
+    char topic_device[200];
+    sprintf(topic_device, "fse2020/160144752/dispositivos/%s", mac);
+
 
     while(true) {
         if(xQueueReceive(interruption_queue, &pin, portMAX_DELAY)){
@@ -71,6 +76,10 @@ void _handle_interruption(void *params){
                     holding_counter++;
                     if(holding_counter == 5000/50){
                         ESP_ERROR_CHECK(nvs_flash_erase());
+
+                        sprintf(msg, "%s", "{delete: true}");
+                        mqtt_send_message(topic_device, msg);
+
                         esp_restart();
                     }
                 }

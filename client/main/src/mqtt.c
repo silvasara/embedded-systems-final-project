@@ -110,6 +110,10 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
                     }
                     if(strcmp(name->valuestring, "reset") == 0){
                         ESP_ERROR_CHECK(nvs_flash_erase());
+
+                        sprintf(msg, "%s", "{delete: true}");
+                        mqtt_send_message(topic, msg);
+
                         esp_restart();
                     }
                 }
