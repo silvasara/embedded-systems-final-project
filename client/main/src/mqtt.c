@@ -51,6 +51,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
     char mac[18];
     get_mac((char *) mac);
     char topic[100];
+    char room[100];
 
     sprintf(topic, "fse2020/160144752/dispositivos/%s", mac);
 
@@ -65,6 +66,14 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
             mqtt_send_message(topic, msg);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             esp_mqtt_client_subscribe(client, topic, 0);
+
+            room[0] = '\0';
+            read_nvs(room);
+            if (strlen(room) != 0){
+                sprintf(topic_room, "fse2020/160144752/%s", room);
+                printf("%s\n", topic_room);
+                esp_mqtt_client_subscribe(client, topic_room, 0);
+            }
 
             break;
 
@@ -94,34 +103,34 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
                 cJSON *data_json = cJSON_Parse(event->data);
                 const cJSON *name = NULL;
 
-                name = cJSON_GetObjectItemCaseSensitive(data_json, "content");
+                name = cJSON_GetObjectItemCaseSensitive(data_json, "room");
                 if (cJSON_IsString(name) && (name->valuestring != NULL)){
                     update_registered_rooms(room_name, name->valuestring);
                 }
-                xSemaphoreGive(conn_mqtt_semaphore);
-                sprintf(topic_room, "fse2020/160144752/%s", room_name);
-                
-                esp_mqtt_client_subscribe(client, topic_room, 0);
+				xSemaphoreGive(conn_mqtt_semaphore);
+				sprintf(topic_room, "fse2020/160144752/%s", room_name);
+				printf("%s\n", topic_room);
+                                              
+				esp_mqtt_client_subscribe(client, topic_room, 0);
             }
             
-            if(!LOW_POWER){
-                if (strcmp(event_topic, topic_room) == 0){
-                    cJSON *data_json = cJSON_Parse(event->data);
-                    const cJSON *name = NULL;
+            //if(!LOW_POWER){
+            if (strcmp(event_topic, topic_room) == 0){
+                cJSON *data_json = cJSON_Parse(event->data);
+                const cJSON *name = NULL;
 
-                    name = cJSON_GetObjectItemCaseSensitive(data_json, "action");
-                    if (cJSON_IsString(name) && (name->valuestring != NULL)){
-                        if(strcmp(name->valuestring, "led") == 0){
-                            _toggle_led();
-                        }
-                        if(strcmp(name->valuestring, "reset") == 0){
-                            ESP_ERROR_CHECK(nvs_flash_erase());
+                name = cJSON_GetObjectItemCaseSensitive(data_json, "action");
+                if (cJSON_IsString(name) && (name->valuestring != NULL)){
+                    if(strcmp(name->valuestring, "led") == 0){
+                        _toggle_led();
+                    }
+                    if(strcmp(name->valuestring, "reset") == 0){
+                        ESP_ERROR_CHECK(nvs_flash_erase());
 
-                            sprintf(msg, "%s", "{delete: true}");
-                            mqtt_send_message(topic, msg);
+                        sprintf(msg, "%s", "{delete: true}");
+                        mqtt_send_message(topic, msg);
 
-                            esp_restart();
-                        }
+                        esp_restart();
                     }
                 }
             }

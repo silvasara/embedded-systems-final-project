@@ -44,7 +44,7 @@ def subscribe(client: mqtt_client, topic):
         if "dispositivos" in msg.topic:
             mac = msg.topic.split("/")[-1]
 
-            if "delete" in data:
+            if "content" in data and "delete" in data["content"]:
                 esp_handler.delete_device(mac)
                 publish(
                     client,
