@@ -117,9 +117,9 @@ def subscribe(client: mqtt_client, topic):
                 )
 
         elif msg.topic == constants.DELETE_TOPIC:
-            mac, response = front_handler.delete_device(data)
+            room, response = front_handler.delete_device(data)
             if response:
-                url = constants.DEVICES_TOPIC[:-1] + mac
+                url = constants.BASE_URL + room
                 publish(
                     client,
                     url,

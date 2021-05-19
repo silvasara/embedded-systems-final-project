@@ -36,10 +36,11 @@ def create_device(body):
 def delete_device(body):
     mac = body["mac"]
     if mac in devices:
+        room = devices[mac]["room"]
         del devices[mac]
         print(f"Device {mac} deleted")
 
-        return mac, {"action": "reset"}
+        return room, {"action": "reset"}
 
     return None, None
 
