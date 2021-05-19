@@ -10,10 +10,7 @@ def connect_mqtt() -> mqtt_client:
         if rc == 0:
             print("Connected to MQTT Broker!")
 
-            # subscribe(client, "fse2020/160144752/room/temperatura")
-            # subscribe(client, "fse2020/160144752/room/umidade")
             subscribe(client, constants.DEVICES_TOPIC)
-            # subscribe(client, "fse2020/160144752/room/estado")
             subscribe(client, constants.CREATE_TOPIC)
             subscribe(client, constants.UPDATE_TOPIC)
             subscribe(client, constants.DELETE_TOPIC)
@@ -33,6 +30,8 @@ def connect_mqtt() -> mqtt_client:
 
 def subscribe(client: mqtt_client, topic):
     def on_message(client, userdata, msg):
+        KEYS = ['temperatura', 'umidade', 'estado']
+
         print(f"Received new message from `{msg.topic}` topic")
         data = json.loads(msg.payload)
 
@@ -47,14 +46,21 @@ def subscribe(client: mqtt_client, topic):
                     json.dumps({"mac": mac})
                 )
 
-        elif "temperatura" in msg.topic:
+        elif any(k in msg.topic for k in KEYS):
+            if 'temperatura' in msg.topic:
+                key = 'temperature'
+            elif 'umidade' in msg.topic:
+                key = 'humidity'
+            else:
+                key = 'sensor'
+
             room = msg.topic.split("/")[-2]
-            temperature = esp_handler.update_temperature(room, data)
-            if temperature:
+            response = esp_handler.update(room, data, key)
+            if response:
                 publish(
                     client,
                     constants.FRONT_TOPIC_UPDATE,
-                    json.dumps(temperature)
+                    json.dumps(response)
                 )
 
         # MESSAGES FROM FRONTEND

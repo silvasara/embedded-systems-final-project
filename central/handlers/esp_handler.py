@@ -3,28 +3,33 @@ from handlers import devices
 
 def init_device(mac):
     if mac in devices:
-        print('Device already initialized')
+        print("Device already initialized")
         return None
 
     return mac
 
 
-def update_temperature(room, body):
-    if 'temperature' not in body:
-        print('Temperature not in body in update')
+def update(room, body, key=""):
+    if "content" not in body:
+        print(f"{key}: content not in body in update")
         return None
 
-    device = [d for d in devices.values() if d['room'] == room]
+    device = [d for d in devices.values() if d["room"] == room]
     if not device:
-        print('Device not found when updating temperature')
+        print(f"Device not found when updating {key}")
         return None
 
     device = device[0]
-    device['temperature'] = body['temperature']
+    if key == "sensor":
+        device["inDevicePressed"] = not device["inDevicePressed"]
+        value = device["inDevicePressed"]
+    else:
+        device[key] = body["content"]
+        value = device[key]
 
     response = {
-        'temperature': device['temperature'],
-        'mac': device['mac']
+        key: value,
+        "mac": device["mac"]
     }
 
     return response

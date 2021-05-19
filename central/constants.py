@@ -12,4 +12,4 @@ DEVICES_TOPIC = "fse2020/160144752/dispositivos/#"
 
 # ###################################################
 
-BROKER = 'mqtt.eclipseprojects.io'
+BROKER = "mqtt.eclipseprojects.io"
