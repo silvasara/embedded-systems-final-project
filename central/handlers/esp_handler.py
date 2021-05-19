@@ -1,3 +1,4 @@
+from alarm import beep
 from handlers import devices
 
 
@@ -29,6 +30,9 @@ def update(room, body, key=""):
     device = device[0]
     if key == "sensor":
         device["inDevicePressed"] = not device["inDevicePressed"]
+        if device["inDevicePressed"] and device["alarmPressed"]:
+            beep()
+
         value = device["inDevicePressed"]
     else:
         device[key] = body["content"]
