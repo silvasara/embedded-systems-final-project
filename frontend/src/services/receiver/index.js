@@ -3,8 +3,9 @@ import React, { useContext, useEffect } from 'react';
 
 import { DeviceContext } from '../../contexts/DeviceContext'
 
-export default function Receiver({ payload, setPayload }) {
-  const { updateTemperature, updateHumidity, toggleInDevice } = useContext(DeviceContext)
+export default function Receiver({ payload, publish, setPayload }) {
+  const { updateTemperature, updateHumidity, toggleInDevice, removeDevice } = useContext(DeviceContext)
+  const STORAGE_TOPIC = 'fse/central/160144752/storage'
 
   useEffect(() => {
     if (payload) {
@@ -23,6 +24,18 @@ export default function Receiver({ payload, setPayload }) {
       if (payload.sensor !== undefined){
         console.log('In device state change!')
         toggleInDevice(payload)
+      }
+
+      if (payload.delete) {
+        console.log('Action delete received')
+        removeDevice(payload)
+      }
+
+      if (payload.storage) {
+        setPayload(null)
+        console.log('Getting storage')
+        const response = localStorage.getItem('devices')
+        publish(STORAGE_TOPIC, response)
       }
 
     }

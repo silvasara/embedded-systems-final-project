@@ -9,11 +9,16 @@ def connect_mqtt() -> mqtt_client:
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
             print("Connected to MQTT Broker!")
-
+            subscribe(client, constants.STORAGE_TOPIC)
             subscribe(client, constants.DEVICES_TOPIC)
             subscribe(client, constants.CREATE_TOPIC)
             subscribe(client, constants.UPDATE_TOPIC)
             subscribe(client, constants.DELETE_TOPIC)
+            publish(
+                client,
+                constants.FRONT_TOPIC_UPDATE,
+                json.dumps({"storage": "get"})
+            )
         else:
             print("Failed to connect, return code %d\n", rc)
 
@@ -30,7 +35,7 @@ def connect_mqtt() -> mqtt_client:
 
 def subscribe(client: mqtt_client, topic):
     def on_message(client, userdata, msg):
-        KEYS = ['temperatura', 'umidade', 'estado']
+        KEYS = ["temperatura", "umidade", "estado"]
 
         print(f"Received new message from `{msg.topic}` topic")
         data = json.loads(msg.payload)
@@ -41,6 +46,13 @@ def subscribe(client: mqtt_client, topic):
 
             if "delete" in data:
                 esp_handler.delete_device(mac)
+                publish(
+                    client,
+                    constants.FRONT_TOPIC_UPDATE,
+                    json.dumps({"delete": "true", "mac": mac})
+                )
+            elif "action" in data:
+                pass
             else:
                 device = esp_handler.init_device(mac)
                 if device:
@@ -51,12 +63,12 @@ def subscribe(client: mqtt_client, topic):
                     )
 
         elif any(k in msg.topic for k in KEYS):
-            if 'temperatura' in msg.topic:
-                key = 'temperature'
-            elif 'umidade' in msg.topic:
-                key = 'humidity'
+            if "temperatura" in msg.topic:
+                key = "temperature"
+            elif "umidade" in msg.topic:
+                key = "humidity"
             else:
-                key = 'sensor'
+                key = "sensor"
 
             room = msg.topic.split("/")[-2]
             response = esp_handler.update(room, data, key)
@@ -68,6 +80,16 @@ def subscribe(client: mqtt_client, topic):
                 )
 
         # MESSAGES FROM FRONTEND
+        elif msg.topic == constants.STORAGE_TOPIC:
+            items = front_handler.set_storage(data)
+            if items:
+                for item in items:
+                    room = item["room"]
+
+                    subscribe(client, f"fse2020/160144752/{room}/temperatura")
+                    subscribe(client, f"fse2020/160144752/{room}/umidade")
+                    subscribe(client, f"fse2020/160144752/{room}/estado")
+
         elif msg.topic == constants.CREATE_TOPIC:
             device = front_handler.create_device(data)
             if device:

@@ -29,6 +29,6 @@ export const DeviceReducer = (state, action) => {
       return {devices: filteredItems}
 
     default:
-      return state
+      return {...state}
   }
 }

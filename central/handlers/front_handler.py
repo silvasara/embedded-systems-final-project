@@ -2,6 +2,19 @@ from utils import validate_keys, build_valid_room
 from handlers import devices
 
 
+def set_storage(body):
+    if not devices and body:
+        items = body
+        for item in items:
+            item['room'] = build_valid_room(item['room'])
+            devices[item['mac']] = item
+
+        print("Storage retrieved successfully: ", devices)
+        return items
+
+    return None
+
+
 def create_device(body):
     keys = ["mac", "room", "temperature", "humidity"]
     if not validate_keys(body, keys):

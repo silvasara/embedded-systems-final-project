@@ -67,7 +67,7 @@ function App() {
       <Register mac={mac} setMac={setMac} publish={mqttPublish}/>
       <DeviceList publish={mqttPublish} />
 
-      <Receiver payload={payload} setPayload={setPayload}/>
+      <Receiver payload={payload} publish={mqttPublish} setPayload={setPayload}/>
 
       <GlobalStyles />
     </DeviceContextProvider>

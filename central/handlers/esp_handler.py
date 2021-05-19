@@ -3,7 +3,7 @@ from handlers import devices
 
 def init_device(mac):
     if mac in devices:
-        print("Device already initialized")
+        print("Device already initialized: received own message")
         return None
 
     return mac
@@ -12,6 +12,8 @@ def init_device(mac):
 def delete_device(mac):
     if mac in devices:
         del devices[mac]
+    else:
+        print("Device already deleted: received own message")
 
 
 def update(room, body, key=""):
