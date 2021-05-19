@@ -50,7 +50,4 @@ def update_device(body):
     elif action == "led":
         devices[mac]["outDevicePressed"] = not devices[mac]["outDevicePressed"]
 
-    # response = {
-    #     "action": action
-    # }
-    return devices[mac]
+    return mac, {"action": action}

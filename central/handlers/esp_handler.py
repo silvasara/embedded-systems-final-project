@@ -9,6 +9,11 @@ def init_device(mac):
     return mac
 
 
+def delete_device(mac):
+    if mac in devices:
+        del devices[mac]
+
+
 def update(room, body, key=""):
     if "content" not in body:
         print(f"{key}: content not in body in update")

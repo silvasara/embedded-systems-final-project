@@ -21,7 +21,7 @@ def connect_mqtt() -> mqtt_client:
         print("Disconnected from MQTT Broker!")
         print("Return code: ", rc)
 
-    client = mqtt_client.Client(client_id="fse-top-pyclientv1.0.0")
+    client = mqtt_client.Client(client_id="fse-top-pyclientv1.0.1")
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
     client.connect(constants.BROKER, 1883, 60)
@@ -38,13 +38,17 @@ def subscribe(client: mqtt_client, topic):
         # MESSAGES FROM ESP32
         if "dispositivos" in msg.topic:
             mac = msg.topic.split("/")[-1]
-            device = esp_handler.init_device(mac)
-            if device:
-                publish(
-                    client,
-                    constants.FRONT_TOPIC_MAC,
-                    json.dumps({"mac": mac})
-                )
+
+            if "delete" in data:
+                esp_handler.delete_device(mac)
+            else:
+                device = esp_handler.init_device(mac)
+                if device:
+                    publish(
+                        client,
+                        constants.FRONT_TOPIC_MAC,
+                        json.dumps({"mac": mac})
+                    )
 
         elif any(k in msg.topic for k in KEYS):
             if 'temperatura' in msg.topic:
@@ -80,7 +84,15 @@ def subscribe(client: mqtt_client, topic):
                 )
 
         elif msg.topic == constants.UPDATE_TOPIC:
-            front_handler.update_device(data)
+            mac, response = front_handler.update_device(data)
+            url = constants.DEVICES_TOPIC[:-1] + mac
+
+            if response:
+                publish(
+                    client,
+                    url,
+                    json.dumps(response)
+                )
 
         elif msg.topic == constants.DELETE_TOPIC:
             deleted = front_handler.delete_device(data)
