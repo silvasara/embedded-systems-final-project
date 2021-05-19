@@ -6,14 +6,24 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "nvs_flash.h"
+#include "esp_sleep.h"
+#include "driver/rtc_io.h"
+
 
 #include "gpio.h"
 #include "mqtt.h"
+
+#ifndef CONFIG_LOW_POWER
+#define CONFIG_LOW_POWER 0
+#endif
+#define LOW_POWER CONFIG_LOW_POWER
 
 extern char room_name[100];
 
 xQueueHandle interruption_queue;
 int led_state = 0;
+
+RTC_DATA_ATTR int Acordou = 0;
 
 static void IRAM_ATTR _gpio_isr_handler(void *args);
 void _handle_interruption(void *params);
@@ -46,6 +56,24 @@ void set_up_gpio(){
     gpio_install_isr_service(0);
     gpio_isr_handler_add(BTN, _gpio_isr_handler, (void *) BTN);
 
+    if(LOW_POWER){
+        char topic[200];
+        char msg[50];
+        rtc_gpio_pullup_en(BTN);
+        rtc_gpio_pulldown_dis(BTN);
+        esp_sleep_enable_ext0_wakeup(BTN, 0);
+
+        printf("Acordou %d vezes \n", Acordou++);
+
+        sprintf(msg, "%s", "acionado");
+        sprintf(topic, "fse2020/160144752/%s/estado", room_name);
+        mqtt_send_message(topic, msg);
+
+        printf("Entrando em modo Deep Sleep\n");
+
+        // Coloca a ESP no Deep Sleep
+        esp_deep_sleep_start();
+    }
 }
 
 // ================================ LOCAL FUNCTIONS ================================

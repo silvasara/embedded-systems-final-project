@@ -13,10 +13,10 @@ menu "Setup Wi-Fi"
             The password to connect with the network with the chosen SSID.
 endmenu
 
-menu "Power Saving"
+menu "Modo de Funcionamento"
 
-    config POWER_SAVING
-        bool "Power Saving"
+    config LOW_POWER
+        bool "Modo bateria"
         default false
         help
             Enable or disable power saving mode in period between publishes

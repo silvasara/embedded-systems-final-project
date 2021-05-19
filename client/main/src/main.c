@@ -3,9 +3,17 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_log.h"
+#include "esp_sleep.h"
 #include "freertos/semphr.h"
 #include "driver/gpio.h"
 #include "dht11.h"
+
+
+#ifndef CONFIG_LOW_POWER
+#define CONFIG_LOW_POWER 0
+#endif
+
+#define LOW_POWER CONFIG_LOW_POWER
 
 
 #include "wifi.h"
@@ -32,6 +40,10 @@ void mqtt_connected(void *params){
     char topic[200];
 
     if(xSemaphoreTake(conn_mqtt_semaphore, portMAX_DELAY)){
+        if(LOW_POWER){
+            exit(-1);
+        }
+
         while(true){
             environ = DHT11_read();
 
@@ -66,9 +78,9 @@ void app_main(void){
     wifi_start();
     DHT11_init(GPIO_NUM_4);
 
-    set_up_gpio();
 
     xTaskCreate(&wifi_connected,  "MQTT connection", 4096, NULL, 1, NULL);
     xTaskCreate(&mqtt_connected,  "Broker communication", 4096, NULL, 1, NULL);
+    set_up_gpio();
 }
 

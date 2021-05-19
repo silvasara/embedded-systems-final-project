@@ -16,6 +16,7 @@
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
 #include "lwip/netdb.h"
+#include "esp_sleep.h"
 
 #include "esp_log.h"
 #include "mqtt_client.h"
@@ -26,6 +27,11 @@
 #include "gpio.h"
 
 #define TAG "MQTT"
+
+#ifndef CONFIG_LOW_POWER
+#define CONFIG_LOW_POWER 0
+#endif
+#define LOW_POWER CONFIG_LOW_POWER
 
 extern xSemaphoreHandle conn_mqtt_semaphore;
 
@@ -42,7 +48,6 @@ char topic_room[200];
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
 
-    int msg_id;
     char mac[18];
     get_mac((char *) mac);
     char topic[100];
@@ -59,7 +64,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
 
             mqtt_send_message(topic, msg);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
-            msg_id = esp_mqtt_client_subscribe(client, topic, 0);
+            esp_mqtt_client_subscribe(client, topic, 0);
 
             break;
 
@@ -96,31 +101,30 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
                 xSemaphoreGive(conn_mqtt_semaphore);
                 sprintf(topic_room, "fse2020/160144752/%s", room_name);
                 
-                msg_id = esp_mqtt_client_subscribe(client, topic_room, 0);
+                esp_mqtt_client_subscribe(client, topic_room, 0);
             }
             
-            if (strcmp(event_topic, topic_room) == 0){
-                cJSON *data_json = cJSON_Parse(event->data);
-                const cJSON *name = NULL;
+            if(!LOW_POWER){
+                if (strcmp(event_topic, topic_room) == 0){
+                    cJSON *data_json = cJSON_Parse(event->data);
+                    const cJSON *name = NULL;
 
-                name = cJSON_GetObjectItemCaseSensitive(data_json, "action");
-                if (cJSON_IsString(name) && (name->valuestring != NULL)){
-                    if(strcmp(name->valuestring, "led") == 0){
-                        _toggle_led();
-                    }
-                    if(strcmp(name->valuestring, "reset") == 0){
-                        ESP_ERROR_CHECK(nvs_flash_erase());
+                    name = cJSON_GetObjectItemCaseSensitive(data_json, "action");
+                    if (cJSON_IsString(name) && (name->valuestring != NULL)){
+                        if(strcmp(name->valuestring, "led") == 0){
+                            _toggle_led();
+                        }
+                        if(strcmp(name->valuestring, "reset") == 0){
+                            ESP_ERROR_CHECK(nvs_flash_erase());
 
-                        sprintf(msg, "%s", "{delete: true}");
-                        mqtt_send_message(topic, msg);
+                            sprintf(msg, "%s", "{delete: true}");
+                            mqtt_send_message(topic, msg);
 
-                        esp_restart();
+                            esp_restart();
+                        }
                     }
                 }
             }
-            
-
-
             break;
         case MQTT_EVENT_ERROR:
             ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -182,5 +186,5 @@ void get_mac(char *mac){
 
     ESP_ERROR_CHECK(esp_read_mac(mac_arr, ESP_MAC_WIFI_STA));
 
-    sprintf(mac, "%2X:%2X:%2X:%2X:%2X:%2X", mac_arr[0], mac_arr[1], mac_arr[2], mac_arr[3], mac_arr[4], mac_arr[5]);
+    sprintf(mac, "%02X:%02X:%02X:%02X:%02X:%02X", mac_arr[0], mac_arr[1], mac_arr[2], mac_arr[3], mac_arr[4], mac_arr[5]);
 }
