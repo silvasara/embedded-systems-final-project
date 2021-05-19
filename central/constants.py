@@ -11,6 +11,8 @@ UPDATE_TOPIC = "fse/central/160144752/update"
 
 DEVICES_TOPIC = "fse2020/160144752/dispositivos/#"
 
+BASE_URL = "fse2020/160144752/"
+
 # ###################################################
 
 BROKER = "mqtt.eclipseprojects.io"

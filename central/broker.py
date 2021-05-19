@@ -106,8 +106,8 @@ def subscribe(client: mqtt_client, topic):
                 )
 
         elif msg.topic == constants.UPDATE_TOPIC:
-            mac, response = front_handler.update_device(data)
-            url = constants.DEVICES_TOPIC[:-1] + mac
+            room, response = front_handler.update_device(data)
+            url = constants.BASE_URL + room
 
             if response:
                 publish(

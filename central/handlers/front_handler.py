@@ -6,8 +6,8 @@ def set_storage(body):
     if not devices and body:
         items = body
         for item in items:
-            item['room'] = build_valid_room(item['room'])
-            devices[item['mac']] = item
+            item["room"] = build_valid_room(item["room"])
+            devices[item["mac"]] = item
 
         print("Storage retrieved successfully: ", devices)
         return items
@@ -55,7 +55,7 @@ def update_device(body):
 
     if mac not in devices:
         print("Error: device is only kept in memory!")
-        return None
+        return None, None
 
     print("Command received: ", body["command"])  # isso aqui vai pro log
 
@@ -64,4 +64,4 @@ def update_device(body):
     elif action == "led":
         devices[mac]["outDevicePressed"] = not devices[mac]["outDevicePressed"]
 
-    return mac, {"action": action}
+    return devices[mac]["room"], {"action": action}
