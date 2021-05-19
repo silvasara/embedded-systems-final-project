@@ -5,6 +5,7 @@
 #include "freertos/queue.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
+#include "nvs_flash.h"
 
 #include "gpio.h"
 #include "mqtt.h"
@@ -37,7 +38,7 @@ void set_up_gpio(){
     gpio_pullup_dis(BTN);
 
     // Config Button to activate on rising edge
-    gpio_set_intr_type(BTN, GPIO_INTR_POSEDGE);
+    gpio_set_intr_type(BTN, GPIO_INTR_NEGEDGE);
 
     interruption_queue = xQueueCreate(10, sizeof(int));
     xTaskCreate(_handle_interruption, "Handle button", 2048, NULL, 1, NULL);
@@ -60,18 +61,26 @@ void _handle_interruption(void *params){
             // De-bouncing
             int state = gpio_get_level(pin);
 
-            if(state == 1){
+            if(state == 0){
                 gpio_isr_handler_remove(pin);
+
+                int holding_counter = 0;
+
                 while(gpio_get_level(pin) == state){
                     vTaskDelay(50 / portTICK_PERIOD_MS);
+                    holding_counter++;
+                    if(holding_counter == 5000/50){
+                        ESP_ERROR_CHECK(nvs_flash_erase());
+                        esp_restart();
+                    }
                 }
 
                 printf("BOTÃO PRESSIONADO %d vezes!\n", ++counter);
                 
-                sprintf(msg, "%d", state);
+                sprintf(msg, "%s", "acionado");
                 sprintf(topic, "fse2020/160144752/%s/estado", room_name);
                 mqtt_send_message(topic, msg);
-                
+
 
                 // Habilitar novamente a interrupção
                 vTaskDelay(50 / portTICK_PERIOD_MS);

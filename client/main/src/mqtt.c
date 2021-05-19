@@ -108,6 +108,10 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
                     if(strcmp(name->valuestring, "led") == 0){
                         _toggle_led();
                     }
+                    if(strcmp(name->valuestring, "reset") == 0){
+                        ESP_ERROR_CHECK(nvs_flash_erase());
+                        esp_restart();
+                    }
                 }
             }
             
