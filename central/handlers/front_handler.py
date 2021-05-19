@@ -25,9 +25,10 @@ def delete_device(body):
     if mac in devices:
         del devices[mac]
         print(f"Device {mac} deleted")
-        return True
 
-    return False
+        return mac, {"action": "reset"}
+
+    return None, None
 
 
 def update_device(body):

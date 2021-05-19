@@ -95,9 +95,14 @@ def subscribe(client: mqtt_client, topic):
                 )
 
         elif msg.topic == constants.DELETE_TOPIC:
-            deleted = front_handler.delete_device(data)
-            if deleted:
-                ...  # publish to reset esp
+            mac, response = front_handler.delete_device(data)
+            if response:
+                url = constants.DEVICES_TOPIC[:-1] + mac
+                publish(
+                    client,
+                    url,
+                    json.dumps(response)
+                )
 
     client.subscribe(topic)
     client.on_message = on_message
